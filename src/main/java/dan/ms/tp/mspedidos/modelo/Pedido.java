@@ -22,5 +22,4 @@ public class Pedido {
     private List<PedidoDetalle> detallePedido;
     private List<HistorialEstado> estados;
     private Double total;
-    private Vendedor vendedor;
 }
