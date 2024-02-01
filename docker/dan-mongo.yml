@@ -4,12 +4,12 @@ services:
   image: mongo
   restart: always
   ports:
-   - 27018:27018
+   - 27017:27017
   volumes:
    - ./mongo-data:/data/db
   environment:
-   MONGO_INITBD_ROOT_USERNAME: root
-   MONGO_INITBD_ROOT_PASSWORD: dan
+   MONGO_INITDB_ROOT_USERNAME: root
+   MONGO_INITDB_ROOT_PASSWORD: dan
   networks:
    - mynetwork
  mongo-express:
@@ -20,7 +20,7 @@ services:
   environment:
    ME_CONFIG_MONGODB_ADMINUSERNAME: root
    ME_CONFIG_MONGODB_ADMINPASSWORD: dan
-   ME_CONFIG_MONGODB_URL: mongodb://root:dan@mongo-dan:27018/
+   ME_CONFIG_MONGODB_URL: mongodb://root:dan@mongo-dan:27017/
   depends_on:
    - mongo-dan
   networks:
