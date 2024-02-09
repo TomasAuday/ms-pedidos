@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import dan.ms.tp.mspedidos.dto.producto.ProductoUpdateStockDto;
 import dan.ms.tp.mspedidos.modelo.Producto;
 
 @Service
@@ -19,4 +20,14 @@ public class ProductoServiceImpl implements ProductoService {
 
         return response.getBody();
     }
+
+    public Producto updateStockProducto(ProductoUpdateStockDto dto){
+        // TODO : MS.Prod implement something like this (route and etc can change)
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<Producto> response = restTemplate.postForEntity(apiBaseUrl + "/stock" , dto, Producto.class);
+
+        return response.getBody();
+    }
+
 }
