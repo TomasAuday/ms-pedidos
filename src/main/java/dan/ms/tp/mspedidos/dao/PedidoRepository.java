@@ -8,9 +8,12 @@ import dan.ms.tp.mspedidos.modelo.Pedido;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PedidoRepository extends MongoRepository<Pedido,String> {
+    Optional<Pedido> findById(String id);
+
     List<Pedido> findByClienteRazonSocial(String razonSocial);
 
     @Query("{'cliente.razonSocial': ?0, 'fecha': {$gte: ?1, $lte: ?2}}")
