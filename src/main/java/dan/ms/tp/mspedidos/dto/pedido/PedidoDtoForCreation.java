@@ -9,7 +9,7 @@ import dan.ms.tp.mspedidos.modelo.Pedido;
 
 @Data
 public class PedidoDtoForCreation {
-    private String user;
+    private String usuario;
     private String observaciones;
     private int cliente;
     private List<DetallePedidoDtoForCreation> detallePedido;
