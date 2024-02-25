@@ -16,6 +16,6 @@ public interface PedidoService {
            
     Pedido createPedido(PedidoDtoForCreation p) throws Exception;
 
-    Pedido cancelPedido(Pedido p);
+    Pedido cancelPedido(String id) throws Exception;
 
 }

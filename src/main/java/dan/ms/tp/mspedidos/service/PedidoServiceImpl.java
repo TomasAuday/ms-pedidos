@@ -129,8 +129,26 @@ public class PedidoServiceImpl implements PedidoService {
         return p;
     }
 
-    public Pedido cancelPedido(Pedido p){
-        // TODO 
-        return p;
+    public Pedido cancelPedido(String id) throws Exception {
+        Pedido pedido = getPedido(id);
+        HistorialEstado ultimoEstado = pedido.getEstados().get(pedido.getEstados().size() - 1);
+
+        EstadoPedido estadoActual = ultimoEstado.getEstado();
+        if (estadoActual == EstadoPedido.RECHAZADO || estadoActual == EstadoPedido.CANCELADO
+                || estadoActual == EstadoPedido.EN_DISTRIBUCION || estadoActual == EstadoPedido.ENTREGADO) {
+            throw new Exception("No se puede cancelar el pedido porque ya se encuentra en un estado final.");
+        }
+        HistorialEstado nuevoEstado = new HistorialEstado();
+        nuevoEstado.setEstado(EstadoPedido.CANCELADO);
+        nuevoEstado.setFechaEstado(Instant.now());
+        nuevoEstado.setDetalle("Pedido cancelado por el cliente.");
+        nuevoEstado.setUserEstado(null);
+
+        pedido.getEstados().add(nuevoEstado);
+
+        // Guardar el pedido actualizado en la base de datos
+        pedidoRepository.save(pedido);
+
+        return pedido;
     }
 }
