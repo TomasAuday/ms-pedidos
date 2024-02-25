@@ -43,7 +43,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     public Pedido createPedido(PedidoDtoForCreation pedidoDto) throws Exception{
-        Pedido p = pedidoDto.map();
+        Pedido p = pedidoDto.toPedido();
 
         Cliente client = clienteService.getCliente(pedidoDto.getCliente());
  

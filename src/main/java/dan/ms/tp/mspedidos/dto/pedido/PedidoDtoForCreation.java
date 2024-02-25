@@ -9,12 +9,13 @@ import dan.ms.tp.mspedidos.modelo.Pedido;
 
 @Data
 public class PedidoDtoForCreation {
+    private Integer numeroPedido;
     private String usuario;
     private String observaciones;
-    private int cliente;
+    private Integer cliente;
     private List<DetallePedidoDtoForCreation> detallePedido;
 
-    public Pedido map(){
+    public Pedido toPedido(){
         Pedido p = new Pedido();
         
         p.setObservaciones(observaciones);
