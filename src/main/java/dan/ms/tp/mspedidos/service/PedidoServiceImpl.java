@@ -44,6 +44,7 @@ public class PedidoServiceImpl implements PedidoService {
 
     public Pedido createPedido(PedidoDtoForCreation pedidoDto) throws Exception{
         Pedido p = pedidoDto.toPedido();
+        double totalPedido = 0;
 
         Cliente client = clienteService.getCliente(pedidoDto.getCliente());
  
@@ -52,6 +53,12 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         List<PedidoDetalle> pedidoDetalles = new ArrayList<>();
+
+        // initial default state 
+        HistorialEstado initialState = new HistorialEstado();
+        initialState.setEstado(EstadoPedido.RECIBIDO);
+        initialState.setFechaEstado(Instant.now());
+        String detalleEstadoInicial =  "";
 
         // obtener y validar productos
         for(DetallePedidoDtoForCreation detallePedidoDto : pedidoDto.getDetallePedido()){
@@ -66,41 +73,58 @@ public class PedidoServiceImpl implements PedidoService {
                 throw new Exception("Producto (id: " + detallePedidoDto.getProducto() + ") no encontrado." );
             }
 
+            // TODO : IMPORTANT! price.get
+            product.setPrecio(100.0);
+            //
+
             if(product.getStockActual() < detallePedidoDto.getCantidad()){
-                // TODO : Should be EstadoPedido.SIN_STOCK
-                throw new Exception("Producto (id: " + detallePedidoDto.getProducto() + ") sin stock" );
+                initialState.setEstado(EstadoPedido.SIN_STOCK);
+                detalleEstadoInicial += product.getNombre() + " no tiene stock suficiente (" + product.getStockActual() + "en stock, " + detallePedidoDto.getCantidad() + "requeridos)";
             }
 
             if(detallePedidoDto.getDescuento() > 1 || detallePedidoDto.getDescuento() < 0){
                 // TODO : Attribute Validation? Some Auto-Validation!
                 throw new Exception("Producto (id: " + detallePedidoDto.getProducto() + ") con descuento invalido");
             }
-            double total = (1  - detallePedidoDto.getDescuento()) * (product.getPrecio() * detallePedidoDto.getCantidad());
+            double totalDetalle = (1  - detallePedidoDto.getDescuento()) * (product.getPrecio() * detallePedidoDto.getCantidad());
+
+            totalPedido += totalDetalle;
 
             PedidoDetalle pedidoDetalle = new PedidoDetalle();
             pedidoDetalle.setProducto(product);
-            pedidoDetalle.setTotal(total);
+            pedidoDetalle.setTotal(totalDetalle);
             pedidoDetalle.setCantidad(detallePedidoDto.getCantidad());
             pedidoDetalle.setDescuento(detallePedidoDto.getDescuento());
 
             pedidoDetalles.add(pedidoDetalle);
         }
-        // TODO : Update Stocks | MS.Prod implementation missing ( or use put maybe ? [inconsistent])
-        // productoService.updateStockProducto(productUpdateDto)
+        // TODO : Update Stock ?? [Stock Readonly]
+         // productoService.updateStockProducto(productUpdateDto)
         
-        //Producto producto = productoService.getProducto();
-        // initial state
-        HistorialEstado estadoInicial = new HistorialEstado();
-        estadoInicial.setEstado(EstadoPedido.EN_PROCESO);
-        estadoInicial.setFechaEstado(Instant.now());
+        if(totalPedido > client.getMaximoCuentaCorriente()){
+            initialState.setEstado(EstadoPedido.RECHAZADO);
+            detalleEstadoInicial += "El maximo de cuenta de " + client.getRazonSocial() + "es menor al total de pedido $"+ Double.toString(totalPedido) +" .\n";
+        }
+
+        if(initialState.getEstado() == EstadoPedido.RECIBIDO){
+            detalleEstadoInicial = "Pedido recibido!";
+        }
+
+        initialState.setDetalle(detalleEstadoInicial);
+
+        // TODO : UserEstado
+        initialState.setUserEstado(null);
+
         
         List<HistorialEstado> historialInicial = new ArrayList<>();
-        historialInicial.add(estadoInicial);
+        historialInicial.add(initialState);
         
         p.setFecha(Instant.now());
         p.setEstados(historialInicial);
         p.setDetallePedido(pedidoDetalles);
         p.setCliente(client);
+        p.setTotal(totalPedido);
+
         pedidoRepository.save(p);
         return p;
     }
