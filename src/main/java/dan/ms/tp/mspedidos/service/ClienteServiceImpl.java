@@ -10,7 +10,7 @@ import dan.ms.tp.mspedidos.modelo.Cliente;
 public class ClienteServiceImpl implements ClienteService {
     // TODO : Magic path
     // TODO : Ex
-    String apiBaseUrl = "http://localhost:3000/producto/";
+    String apiBaseUrl = "http://localhost:8080/api/cliente/";
 
     public Cliente getCliente(int id){
         RestTemplate restTemplate = new RestTemplate();
