@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dan.ms.tp.mspedidos.dto.pedido.PedidoDtoForCreation;
 import dan.ms.tp.mspedidos.modelo.Pedido;
 import dan.ms.tp.mspedidos.service.PedidoService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/pedido")
@@ -25,7 +26,7 @@ public class PedidoController {
     @Autowired PedidoService pedidoService;
     
     @PostMapping
-    public ResponseEntity<Pedido> guardar(@RequestBody PedidoDtoForCreation pedido){
+    public ResponseEntity<Pedido> guardar(@Valid @RequestBody PedidoDtoForCreation pedido){
         try{
             Pedido createdPedido = pedidoService.createPedido(pedido);
             return ResponseEntity.ok().body(createdPedido);
