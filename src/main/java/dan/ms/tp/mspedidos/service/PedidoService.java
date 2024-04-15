@@ -1,5 +1,6 @@
 package dan.ms.tp.mspedidos.service;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ public interface PedidoService {
 
     Pedido getPedido(String id) throws Exception;
 
-    List<Pedido> getPedidosByCliente(String razonSocial);
+    List<Pedido> getPedidosByClienteOrDate(String razonSocial, Instant fromDate, Instant toDate);
            
     Pedido createPedido(PedidoDtoForCreation p) throws Exception;
 

@@ -37,9 +37,16 @@ public class PedidoServiceImpl implements PedidoService {
         throw new Exception("Pedido no encontrado");
     }
 
-    public List<Pedido> getPedidosByCliente(String razonSocial){
-        // TODO : 
-        return new ArrayList<Pedido>();
+    public List<Pedido> getPedidosByClienteOrDate(String razonSocial, Instant fromDate, Instant toDate){
+
+        if(fromDate == null) fromDate = Instant.ofEpochMilli(Long.MIN_VALUE);
+        if(toDate == null) toDate = Instant.ofEpochMilli(Long.MAX_VALUE);
+
+        if(razonSocial == null || razonSocial.trim() == ""){
+            return pedidoRepository.findByFecha(fromDate, toDate);
+        }
+
+        return pedidoRepository.findByClienteFecha(razonSocial, fromDate, toDate);
     }
 
     public Pedido createPedido(PedidoDtoForCreation pedidoDto) throws Exception{

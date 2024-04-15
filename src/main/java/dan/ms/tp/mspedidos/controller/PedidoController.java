@@ -1,6 +1,6 @@
 package dan.ms.tp.mspedidos.controller;
 
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import dan.ms.tp.mspedidos.dto.pedido.PedidoDtoForCreation;
@@ -21,8 +22,6 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("api/pedido")
 public class PedidoController {
-    
-    // @Autowired PedidoRepository repo;
     @Autowired PedidoService pedidoService;
     
     @PostMapping
@@ -34,15 +33,13 @@ public class PedidoController {
             // TODO Ex
             return ResponseEntity.internalServerError().build();
         }
-        //return ResponseEntity.ok().body(repo.save(pedido));
     }
 
     @GetMapping
-    public ResponseEntity<List<Pedido>> buscar(){
-        // TODO : Busquedas
-        return ResponseEntity.ok().body(new ArrayList<Pedido>());
-        //return ResponseEntity.ok().body(repo.findAll());
+    public ResponseEntity<List<Pedido>> buscar(@RequestParam(required = false) String razonSocial, @RequestParam(required = false) Instant desde,@RequestParam(required = false) Instant hasta){
+        return ResponseEntity.ok().body(pedidoService.getPedidosByClienteOrDate(razonSocial, desde, hasta));
     }
+    
     @PutMapping("/{id}/cancelar")
     public ResponseEntity<?> cancelarPedido(@PathVariable String id) {
         try {
