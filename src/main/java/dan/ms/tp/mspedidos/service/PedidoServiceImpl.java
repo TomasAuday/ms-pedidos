@@ -105,8 +105,6 @@ public class PedidoServiceImpl implements PedidoService {
 
             pedidoDetalles.add(pedidoDetalle);
         }
-        // TODO : Update Stock ?? [Stock Readonly]
-         // productoService.updateStockProducto(productUpdateDto)
         
         if(totalPedido > client.getMaximoCuentaCorriente()){
             initialState.setEstado(EstadoPedido.RECHAZADO);

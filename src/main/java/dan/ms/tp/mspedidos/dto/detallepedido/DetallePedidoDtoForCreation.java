@@ -12,7 +12,7 @@ public class DetallePedidoDtoForCreation {
     @NotNull
     @Range(min = 1, max  = 1000)
     private Integer cantidad;
-    // CHECKME : How should descuento be applied?
+
     @Range(min = 0, max  = 1)
     private Double descuento;
 }
