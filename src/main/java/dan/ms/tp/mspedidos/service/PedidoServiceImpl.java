@@ -80,9 +80,6 @@ public class PedidoServiceImpl implements PedidoService {
                 throw new Exception("Producto (id: " + detallePedidoDto.getProducto() + ") no encontrado." );
             }
 
-            // TODO : IMPORTANT! price.get
-            product.setPrecio(100.0);
-            //
 
             if(product.getStockActual() < detallePedidoDto.getCantidad()){
                 initialState.setEstado(EstadoPedido.SIN_STOCK);
@@ -93,7 +90,7 @@ public class PedidoServiceImpl implements PedidoService {
                 // TODO : Attribute Validation? Some Auto-Validation!
                 throw new Exception("Producto (id: " + detallePedidoDto.getProducto() + ") con descuento invalido");
             }
-            double totalDetalle = (1  - detallePedidoDto.getDescuento()) * (product.getPrecio() * detallePedidoDto.getCantidad());
+            double totalDetalle = (1  - detallePedidoDto.getDescuento()) * (product.getPrecioVenta() * detallePedidoDto.getCantidad());
 
             totalPedido += totalDetalle;
 
