@@ -11,7 +11,7 @@ import dan.ms.tp.mspedidos.service.ConsumeMessageService;
 @Configuration
 public class ConfigureRabbitMq {
 
-    public static final String QUEUE_NAME = "myQueue";
+    public static final String QUEUE_NAME = "pedidos";
 
     @Bean
     SimpleMessageListenerContainer simpleMessageListenerContainer(ConnectionFactory connectionFactory, MessageListenerAdapter messageListenerAdapter) {
