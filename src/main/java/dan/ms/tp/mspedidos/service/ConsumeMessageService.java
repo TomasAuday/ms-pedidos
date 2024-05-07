@@ -28,6 +28,9 @@ public class ConsumeMessageService {
     private PedidoRepository pedidoRepository;
 
     @Autowired
+    private ClienteServiceImpl clienteService;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @RabbitListener(queues = "pedidos")
@@ -39,11 +42,11 @@ public class ConsumeMessageService {
         try {
             Thread.sleep(5000);
             pago = objectMapper.readValue(pagoJson, PagoDtoForDecision.class);
-            //String correoElectronico = processPedido(pago);
+            String correoElectronico = processPedido(pago);
             
 
             // Convertir el objeto MensajeProcesadoDto a JSON
-            String successMessage = objectMapper.writeValueAsString(new MensajeProcesadoDto(pago.getNumeroPedido(), "Pedido procesado correctamente", "correoElectronico"));
+            String successMessage = objectMapper.writeValueAsString(new MensajeProcesadoDto(pago.getNumeroPedido(), correoElectronico, pago.getDecision()));
             // Enviar el JSON a través de RabbitMQ
             rabbitTemplate.convertAndSend("respuesta.pedidos", successMessage);
 
@@ -51,8 +54,10 @@ public class ConsumeMessageService {
             System.out.println("Mensaje de confirmación enviado a RabbitMQ: " + successMessage);
         } catch (Exception e) {
             if (pago != null) {
+                
                 // Convertir el objeto MensajeProcesadoDto a JSON
-                String errorMessage = objectMapper.writeValueAsString(new MensajeProcesadoDto(pago.getNumeroPedido(), "Error al procesar el pedido", ""));
+                String errorMessage = objectMapper.writeValueAsString(new MensajeProcesadoDto(pago.getNumeroPedido(), 
+                clienteService.getCliente(pago.getIdUsuario()).getCorreoElectronico(), "Ya se encontraba en un estado final"));
                 // Enviar el JSON a través de RabbitMQ
                 rabbitTemplate.convertAndSend("respuesta.pedidos", errorMessage);
     
@@ -69,7 +74,7 @@ public class ConsumeMessageService {
         HistorialEstado ultimoEstado = pedido.getEstados().get(pedido.getEstados().size() - 1);
 
         EstadoPedido estadoActual = ultimoEstado.getEstado();
-        if (estadoActual == EstadoPedido.RECHAZADO || estadoActual == EstadoPedido.CANCELADO
+        if (estadoActual == EstadoPedido.RECHAZADO || estadoActual == EstadoPedido.CANCELADO || estadoActual == EstadoPedido.PAGO
                 || estadoActual == EstadoPedido.EN_DISTRIBUCION || estadoActual == EstadoPedido.ENTREGADO) {
             throw new Exception("No se puede cancelar el pedido porque ya se encuentra en un estado final.");
         }
@@ -80,9 +85,9 @@ public class ConsumeMessageService {
             nuevoEstado.setDetalle("Pedido cancelado por el admin.");
         } else {
             nuevoEstado.setEstado(EstadoPedido.PAGO);
+            nuevoEstado.setDetalle("Pedido aceptado por el admin.");
         }
         nuevoEstado.setFechaEstado(Instant.now());
-        nuevoEstado.setDetalle("Pedido aceptado por el admin.");
         nuevoEstado.setUserEstado(String.valueOf(pago.getIdUsuario()));
 
         pedido.getEstados().add(nuevoEstado);
