@@ -32,13 +32,15 @@ public class ConsumeMessageService {
 
     @RabbitListener(queues = "pedidos")
     public void consumeMessage(String pagoJson) throws JsonProcessingException {
+        
         System.out.println("Mensaje recibido de la cola de pedidos: " + pagoJson);
         PagoDtoForDecision pago = null;
         
         try {
+            Thread.sleep(5000);
             pago = objectMapper.readValue(pagoJson, PagoDtoForDecision.class);
             //String correoElectronico = processPedido(pago);
-            Thread.sleep(5000);
+            
 
             // Convertir el objeto MensajeProcesadoDto a JSON
             String successMessage = objectMapper.writeValueAsString(new MensajeProcesadoDto(pago.getNumeroPedido(), "Pedido procesado correctamente", "correoElectronico"));
@@ -84,8 +86,6 @@ public class ConsumeMessageService {
         nuevoEstado.setUserEstado(String.valueOf(pago.getIdUsuario()));
 
         pedido.getEstados().add(nuevoEstado);
-        
-        Thread.sleep(5000);
         
         // Guardar el pedido actualizado en la base de datos
         pedidoRepository.save(pedido);

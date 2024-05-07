@@ -22,7 +22,8 @@ public class ConfigureRabbitMq {
         simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
         simpleMessageListenerContainer.setQueueNames(QUEUE_NAME);
         simpleMessageListenerContainer.setMessageListener(messageListenerAdapter);
-        simpleMessageListenerContainer.setConcurrentConsumers(1);
+        simpleMessageListenerContainer.setConcurrentConsumers(1); // Set to 1 for single message processing
+        simpleMessageListenerContainer.setPrefetchCount(1);
         return simpleMessageListenerContainer;
     }
 
