@@ -14,11 +14,15 @@ public class ConfigureRabbitMq {
     public static final String QUEUE_NAME = "pedidos";
 
     @Bean
-    SimpleMessageListenerContainer simpleMessageListenerContainer(ConnectionFactory connectionFactory, MessageListenerAdapter messageListenerAdapter) {
+    SimpleMessageListenerContainer simpleMessageListenerContainer(
+            ConnectionFactory connectionFactory,
+            MessageListenerAdapter messageListenerAdapter
+    ) {
         SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
         simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
         simpleMessageListenerContainer.setQueueNames(QUEUE_NAME);
         simpleMessageListenerContainer.setMessageListener(messageListenerAdapter);
+        simpleMessageListenerContainer.setConcurrentConsumers(1);
         return simpleMessageListenerContainer;
     }
 
@@ -27,5 +31,5 @@ public class ConfigureRabbitMq {
         return new MessageListenerAdapter(consumeMessageService, "consumeMessage");
     }
 
-
 }
+
