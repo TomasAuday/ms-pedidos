@@ -44,13 +44,9 @@ public class ConsumeMessageService {
             pago = objectMapper.readValue(pagoJson, PagoDtoForDecision.class);
             String correoElectronico = processPedido(pago);
             
-
-            // Convertir el objeto MensajeProcesadoDto a JSON
             String successMessage = objectMapper.writeValueAsString(new MensajeProcesadoDto(pago.getIdPedido(), correoElectronico, pago.getDecision()));
-            // Enviar el JSON a través de RabbitMQ
             rabbitTemplate.convertAndSend("respuesta.pedidos", successMessage);
 
-            // Agregar un mensaje de registro para verificar si se envió el mensaje
             System.out.println("Mensaje de confirmación enviado a RabbitMQ: " + successMessage);
         } catch (Exception e) {
             if (pago != null) {
