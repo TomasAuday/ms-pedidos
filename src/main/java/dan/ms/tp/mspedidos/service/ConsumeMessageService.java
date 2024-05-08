@@ -46,7 +46,7 @@ public class ConsumeMessageService {
             
 
             // Convertir el objeto MensajeProcesadoDto a JSON
-            String successMessage = objectMapper.writeValueAsString(new MensajeProcesadoDto(pago.getNumeroPedido(), correoElectronico, pago.getDecision()));
+            String successMessage = objectMapper.writeValueAsString(new MensajeProcesadoDto(pago.getIdPedido(), correoElectronico, pago.getDecision()));
             // Enviar el JSON a través de RabbitMQ
             rabbitTemplate.convertAndSend("respuesta.pedidos", successMessage);
 
@@ -56,7 +56,7 @@ public class ConsumeMessageService {
             if (pago != null) {
                 
                 // Convertir el objeto MensajeProcesadoDto a JSON
-                String errorMessage = objectMapper.writeValueAsString(new MensajeProcesadoDto(pago.getNumeroPedido(), 
+                String errorMessage = objectMapper.writeValueAsString(new MensajeProcesadoDto(pago.getIdPedido(), 
                 clienteService.getCliente(pago.getIdUsuario()).getCorreoElectronico(), "Ya se encontraba en un estado final"));
                 // Enviar el JSON a través de RabbitMQ
                 rabbitTemplate.convertAndSend("respuesta.pedidos", errorMessage);
@@ -70,7 +70,7 @@ public class ConsumeMessageService {
     }
 
     private String processPedido(PagoDtoForDecision pago) throws Exception {
-        Pedido pedido = getPedido(pago.getNumeroPedido());
+        Pedido pedido = getPedido(pago.getIdPedido());
         HistorialEstado ultimoEstado = pedido.getEstados().get(pedido.getEstados().size() - 1);
 
         EstadoPedido estadoActual = ultimoEstado.getEstado();

@@ -3,7 +3,7 @@ package dan.ms.tp.mspedidos.dto.pedido;
 
 
 public class PagoDtoForDecision {
-    private String numeroPedido;
+    private String idPedido;
     private Integer idUsuario;
     private String decision;
 
@@ -11,18 +11,18 @@ public class PagoDtoForDecision {
         // Constructor vacío necesario para deserialización por Spring
     }
 
-    public PagoDtoForDecision(String numeroPedido, Integer idUsuario, String decision) {
-        this.numeroPedido = numeroPedido;
+    public PagoDtoForDecision(String idPedido, Integer idUsuario, String decision) {
+        this.idPedido = idPedido;
         this.idUsuario = idUsuario;
         this.decision = decision;
     }
 
-    public String getNumeroPedido() {
-        return numeroPedido;
+    public String getIdPedido() {
+        return idPedido;
     }
 
-    public void setNumeroPedido(String numeroPedido) {
-        this.numeroPedido = numeroPedido;
+    public void setIdPedido(String idPedido) {
+        this.idPedido = idPedido;
     }
 
     public Integer getIdUsuario() {
