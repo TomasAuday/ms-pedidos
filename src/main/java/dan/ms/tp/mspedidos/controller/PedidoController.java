@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,13 +21,15 @@ import dan.ms.tp.mspedidos.service.PedidoService;
 import jakarta.validation.Valid;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3001")
 @RequestMapping("api/pedido")
 public class PedidoController {
     @Autowired PedidoService pedidoService;
     
     @PostMapping
     public ResponseEntity<Pedido> guardar(@Valid @RequestBody PedidoDtoForCreation pedido){
-        try{
+        try{    
+            System.out.println(pedido);
             Pedido createdPedido = pedidoService.createPedido(pedido);
             return ResponseEntity.ok().body(createdPedido);
         } catch (Exception e) {
