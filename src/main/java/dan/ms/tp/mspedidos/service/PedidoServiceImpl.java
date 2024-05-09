@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import dan.ms.tp.mspedidos.dao.PedidoRepository;
+import dan.ms.tp.mspedidos.dto.auth.UserInfo;
 import dan.ms.tp.mspedidos.dto.detallepedido.DetallePedidoDtoForCreation;
 import dan.ms.tp.mspedidos.dto.pedido.PedidoDtoForCreation;
+import dan.ms.tp.mspedidos.filter.UserInfoContextHolder;
 import dan.ms.tp.mspedidos.modelo.Cliente;
 import dan.ms.tp.mspedidos.modelo.EstadoPedido;
 import dan.ms.tp.mspedidos.modelo.HistorialEstado;
@@ -26,6 +28,8 @@ public class PedidoServiceImpl implements PedidoService {
     ProductoService productoService;
     @Autowired
     ClienteService clienteService;
+    @Autowired
+    AuthUserService authUserService;
 
     // Fix Exceptions / Exception middleware / etc
     public Pedido getPedido(String id) throws Exception{
@@ -37,8 +41,16 @@ public class PedidoServiceImpl implements PedidoService {
         throw new Exception("Pedido no encontrado");
     }
 
-    public List<Pedido> getPedidosByClienteOrDate(String razonSocial, Instant fromDate, Instant toDate){
+    public Pedido getPedidoByNumeroPedido(Integer numeroPedido) throws Exception{
+        Optional<Pedido> pedido = pedidoRepository.findOneByNumeroPedido(numeroPedido);
 
+        if(pedido.isPresent()){
+            return pedido.get();
+        }
+        throw new Exception("Pedido no encontrado");
+    }
+
+    public List<Pedido> getPedidosByClienteOrDate(String razonSocial, Instant fromDate, Instant toDate){
         if(fromDate == null) fromDate = Instant.ofEpochMilli(Long.MIN_VALUE);
         if(toDate == null) toDate = Instant.ofEpochMilli(Long.MAX_VALUE);
 
@@ -53,6 +65,14 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido p = pedidoDto.toPedido();
         double totalPedido = 0;
 
+        // gen numeropedido
+        Integer nextNumeroPedido = 1;
+
+        Optional<Pedido> lastPedido = pedidoRepository.findFirstByOrderByNumeroPedidoDesc();
+        if(lastPedido.isPresent()){
+            nextNumeroPedido = lastPedido.get().getNumeroPedido() + 1;
+        }
+        
         Cliente client = clienteService.getCliente(pedidoDto.getCliente());
  
         if (pedidoDto.getDetallePedido() == null){
@@ -121,11 +141,17 @@ public class PedidoServiceImpl implements PedidoService {
         List<HistorialEstado> historialInicial = new ArrayList<>();
         historialInicial.add(initialState);
         
+        p.setNumeroPedido(nextNumeroPedido);
         p.setFecha(Instant.now());
         p.setEstados(historialInicial);
         p.setDetallePedido(pedidoDetalles);
         p.setCliente(client);
         p.setTotal(totalPedido);
+
+        UserInfo authUserInfo = authUserService.getCurrentUser();
+        if(authUserInfo != null && !authUserInfo.getUserName().trim().isEmpty()){
+            p.setUser(authUserInfo.getUserName());
+        }
 
         pedidoRepository.save(p);
         return p;
@@ -143,8 +169,11 @@ public class PedidoServiceImpl implements PedidoService {
         HistorialEstado nuevoEstado = new HistorialEstado();
         nuevoEstado.setEstado(EstadoPedido.CANCELADO);
         nuevoEstado.setFechaEstado(Instant.now());
-        nuevoEstado.setDetalle("Pedido cancelado por el cliente.");
         nuevoEstado.setUserEstado(null);
+        nuevoEstado.setDetalle("Pedido cancelado.");
+
+        UserInfo authUserInfo = authUserService.getCurrentUser();
+        setHistorialEstadoDetalleCanceladoBasedOnUser(nuevoEstado, authUserInfo);
 
         pedido.getEstados().add(nuevoEstado);
 
@@ -152,5 +181,23 @@ public class PedidoServiceImpl implements PedidoService {
         pedidoRepository.save(pedido);
 
         return pedido;
+    }
+
+    private void setHistorialEstadoDetalleCanceladoBasedOnUser(HistorialEstado estado, UserInfo authUserInfo){
+        if(estado == null || authUserInfo == null || authUserInfo.getTipoUsuario().trim().isEmpty()){
+            return;
+        }
+        try{
+            if(authUserInfo.getTipoUsuario() == "ADMIN"){
+                estado.setDetalle("Pedido cancelado por un administrador.");
+                return;
+            }
+            else if(authUserInfo.getTipoUsuario() == "CLIENTE"){
+                estado.setDetalle("Pedido cancelado por el cliente.");
+            }
+        } catch (Exception exception){
+            return;
+        }
+        
     }
 }

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import dan.ms.tp.mspedidos.dto.pedido.PedidoDtoForCreation;
 import dan.ms.tp.mspedidos.modelo.Pedido;
 import dan.ms.tp.mspedidos.service.PedidoService;
@@ -35,6 +34,27 @@ public class PedidoController {
         } catch (Exception e) {
             // TODO Ex
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Pedido> buscar(@PathVariable String id){
+        try{
+            Pedido pedido = pedidoService.getPedido(id);
+            return ResponseEntity.ok().body(pedido);
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
+        
+    }
+
+    @GetMapping("/numeroPedido/{numeroPedido}")
+    public ResponseEntity<Pedido> buscar(@PathVariable Integer numeroPedido){
+        try{
+            Pedido pedido = pedidoService.getPedidoByNumeroPedido(numeroPedido);
+            return ResponseEntity.ok().body(pedido);
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
         }
     }
 

@@ -14,6 +14,10 @@ import java.util.Optional;
 public interface PedidoRepository extends MongoRepository<Pedido,String> {
     Optional<Pedido> findById(String id);
 
+    Optional<Pedido> findOneByNumeroPedido(Integer numeroPedido);
+
+    Optional<Pedido> findFirstByOrderByNumeroPedidoDesc();
+
     List<Pedido> findByClienteRazonSocial(String razonSocial);
 
     @Query("{'fecha': {$gte: ?0, $lte: ?1} }")

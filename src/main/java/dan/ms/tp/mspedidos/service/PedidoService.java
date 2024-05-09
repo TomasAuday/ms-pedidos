@@ -13,6 +13,8 @@ public interface PedidoService {
 
     Pedido getPedido(String id) throws Exception;
 
+    Pedido getPedidoByNumeroPedido(Integer numeroPedido) throws Exception;
+
     List<Pedido> getPedidosByClienteOrDate(String razonSocial, Instant fromDate, Instant toDate);
            
     Pedido createPedido(PedidoDtoForCreation p) throws Exception;
