@@ -12,7 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dan.ms.tp.mspedidos.dao.PedidoRepository;
-import dan.ms.tp.mspedidos.dto.mensajeprocesado.MensajeProcesadoDto;
+import dan.ms.tp.mspedidos.dto.mensajeProcesado.MensajeProcesadoDto;
 import dan.ms.tp.mspedidos.dto.pedido.PagoDtoForDecision;
 import dan.ms.tp.mspedidos.modelo.EstadoPedido;
 import dan.ms.tp.mspedidos.modelo.HistorialEstado;

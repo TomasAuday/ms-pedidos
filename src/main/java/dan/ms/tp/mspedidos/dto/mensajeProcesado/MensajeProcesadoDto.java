@@ -1,4 +1,4 @@
-package dan.ms.tp.mspedidos.dto.mensajeprocesado;
+package dan.ms.tp.mspedidos.dto.mensajeProcesado;
 
 public class MensajeProcesadoDto {
 
@@ -24,7 +24,7 @@ public class MensajeProcesadoDto {
         this.idPedido = idPedido;
     }
 
-    public String getIdUsuario() {
+    public String getEmailCliente() {
         return emailCliente;
     }
 
