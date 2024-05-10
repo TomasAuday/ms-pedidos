@@ -10,4 +10,10 @@ public class Cliente {
     private Integer deuda;
     private String correoElectronico;
     private Double maximoCuentaCorriente;
+
+
+    public static boolean isEmpty(Cliente c){
+        return c.id <= -1;
+    }
+
 }

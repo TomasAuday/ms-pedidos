@@ -12,7 +12,6 @@ import dan.ms.tp.mspedidos.dao.PedidoRepository;
 import dan.ms.tp.mspedidos.dto.auth.UserInfo;
 import dan.ms.tp.mspedidos.dto.detallepedido.DetallePedidoDtoForCreation;
 import dan.ms.tp.mspedidos.dto.pedido.PedidoDtoForCreation;
-import dan.ms.tp.mspedidos.filter.UserInfoContextHolder;
 import dan.ms.tp.mspedidos.modelo.Cliente;
 import dan.ms.tp.mspedidos.modelo.EstadoPedido;
 import dan.ms.tp.mspedidos.modelo.HistorialEstado;
@@ -74,6 +73,11 @@ public class PedidoServiceImpl implements PedidoService {
         }
         
         Cliente client = clienteService.getCliente(pedidoDto.getCliente());
+
+        if(Cliente.isEmpty(client)){
+            // log
+            throw new Exception("Cliente Server Error");
+        }
  
         if (pedidoDto.getDetallePedido() == null){
             throw new Exception("Pedido sin detalle de pedido");
