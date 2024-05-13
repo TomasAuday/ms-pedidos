@@ -17,8 +17,10 @@ public interface PedidoService {
 
     List<Pedido> getPedidosByClienteOrDate(String razonSocial, Instant fromDate, Instant toDate);
            
-    Pedido createPedido(PedidoDtoForCreation p) throws Exception;
+    Pedido createPedido(PedidoDtoForCreation p, String token) throws Exception;
 
     Pedido cancelPedido(String id) throws Exception;
+    
+    List<Pedido> getAllPedidos();
 
 }

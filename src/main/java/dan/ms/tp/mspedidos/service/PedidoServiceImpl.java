@@ -49,6 +49,11 @@ public class PedidoServiceImpl implements PedidoService {
         throw new Exception("Pedido no encontrado");
     }
 
+
+    public List<Pedido> getAllPedidos() {
+        return pedidoRepository.findAll();
+    }
+
     public List<Pedido> getPedidosByClienteOrDate(String razonSocial, Instant fromDate, Instant toDate){
         if(fromDate == null) fromDate = Instant.ofEpochMilli(Long.MIN_VALUE);
         if(toDate == null) toDate = Instant.ofEpochMilli(Long.MAX_VALUE);
@@ -60,7 +65,9 @@ public class PedidoServiceImpl implements PedidoService {
         return pedidoRepository.findByClienteFecha(razonSocial, fromDate, toDate);
     }
 
-    public Pedido createPedido(PedidoDtoForCreation pedidoDto) throws Exception{
+    public Pedido createPedido(PedidoDtoForCreation pedidoDto, String token) throws Exception{
+        System.out.println("[PEDIDOSERVICEIMPL][CreatePedido][INIT]");
+        
         Pedido p = pedidoDto.toPedido();
         double totalPedido = 0;
 
@@ -69,17 +76,25 @@ public class PedidoServiceImpl implements PedidoService {
 
         Optional<Pedido> lastPedido = pedidoRepository.findFirstByOrderByNumeroPedidoDesc();
         if(lastPedido.isPresent()){
+            
             nextNumeroPedido = lastPedido.get().getNumeroPedido() + 1;
         }
         
-        Cliente client = clienteService.getCliente(pedidoDto.getCliente());
+
+
+        Cliente client = clienteService.getCliente(pedidoDto.getCliente(), token);
+        System.out.println("[PEDIDOSERVICEIMPL][CreatePedido][CLIENTE]:");
+        System.out.println(client.toString());
 
         if(Cliente.isEmpty(client)){
             // log
+            System.out.println("[PEDIDOSERVICEIMPL][CreatePedido][NO HAY CLIENTE]");
+            
             throw new Exception("Cliente Server Error");
         }
  
         if (pedidoDto.getDetallePedido() == null){
+            System.out.println("[PEDIDOSERVICEIMPL][CreatePedido][NO HAY DETALLE DEL PEDIDO]");
             throw new Exception("Pedido sin detalle de pedido");
         }
 
@@ -94,13 +109,16 @@ public class PedidoServiceImpl implements PedidoService {
         // obtener y validar productos
         for(DetallePedidoDtoForCreation detallePedidoDto : pedidoDto.getDetallePedido()){
             if(detallePedidoDto.getProducto() == null){
+                System.out.println("[PEDIDOSERVICEIMPL][CreatePedido][NO HAY DETALLE DEL PEDIDO DENTRO DEL FOR]");
                 throw new Exception("Pedido sin detalle de pedido");
             }
             
             // TODO : optimize fetch
-            Producto product = productoService.getProducto(detallePedidoDto.getProducto());
+            Producto product = productoService.getProducto(detallePedidoDto.getProducto(), token);
 
             if(product == null){
+                System.out.println("[PEDIDOSERVICEIMPL][CreatePedido][FOR - PRODUCTO NO ENCONTRADO]");
+                
                 throw new Exception("Producto (id: " + detallePedidoDto.getProducto() + ") no encontrado." );
             }
 

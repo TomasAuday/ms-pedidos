@@ -53,7 +53,7 @@ public class ConsumeMessageService {
                 
                 // Convertir el objeto MensajeProcesadoDto a JSON
                 String errorMessage = objectMapper.writeValueAsString(new MensajeProcesadoDto(pago.getIdPedido(), 
-                clienteService.getCliente(pago.getIdUsuario()).getCorreoElectronico(), "Ya se encontraba en un estado final"));
+                clienteService.getCliente(pago.getIdUsuario(), "asd").getCorreoElectronico(), "Ya se encontraba en un estado final"));
                 // Enviar el JSON a través de RabbitMQ
                 rabbitTemplate.convertAndSend("respuesta.pedidos", errorMessage);
     
