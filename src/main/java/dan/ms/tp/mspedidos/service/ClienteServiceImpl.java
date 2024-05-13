@@ -38,9 +38,11 @@ public class ClienteServiceImpl implements ClienteService {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        //  ResponseEntity<Cliente> response = restTemplate.getForEntity(endpointPath  + "/api/cliente/" + id , Cliente.class);
+       
+
         ResponseEntity<Cliente> response = restTemplate.exchange(endpointPath + "/api/cliente/" + id, HttpMethod.GET, entity, Cliente.class);
         return response.getBody();
+        
         // return circuitBreaker.run(() -> restTemplate.getForEntity(endpointPath + "/api/cliente/" + id , Cliente.class).getBody(), throwable -> getClienteFallback(throwable));
     }
 
